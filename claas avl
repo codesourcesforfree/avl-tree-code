@@ -1,0 +1,257 @@
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
+
+
+public class avl {
+	//les attributs
+			private int x;
+			private avl G,D;
+			 private int hauteur ;
+			
+			//le constructeur
+			public avl(int x, avl G,avl D){
+			 this.x=x;
+			 this.G=G;
+			 this.D=D;
+			 hauteur = 1 + Math.max(H(G), H(D));
+			}
+			public static int H(avl a)
+			{
+			return (a == null) ? 0 : a.hauteur;
+			}
+			public static void  calculerHauteur(avl a)
+			{
+			a.hauteur = 1 + Math.max(H(a.G), H(a.D));
+			}
+			public static avl equilibrer(avl a)
+			{
+				calculerHauteur(a);
+			if (H(a.G) - H(a.D) == 2)
+			{
+			if (H(a.G.G) < H(a.G.D)) a.G = rotationG(a.G);
+			return rotationD(a);
+			} // else
+			if(H(a.G)- H(a.D) == -2){
+				if (H(a.D.D) < H(a.D.G)) a.D = rotationD(a.D);
+				return rotationG(a);
+			}
+			return a;
+			}
+
+
+			public static int hauteur1 (avl a)                 
+			{
+				int hg, hd;    
+			  if (a == null) 	    return 0;                   
+			  else {
+				  hg=hauteur1(a.G);                       
+				  hd=hauteur1(a.D);                       
+				  if (hg>hd ) return 1+ hg;                  
+				  else return 1+hd;                          
+			  }
+			}
+			public static int facteurE (avl a)                 
+			{
+				int hg, hd;    
+				  hg=hauteur1(a.G);                       
+				  hd=hauteur1(a.D);                       
+				   return hg -hd;                  
+				                        
+			}
+			
+			
+			//Affichage infixe
+			public static void infixe(avl A){
+			 if (A!=null){
+			 infixe(A.G);
+			 //traitement
+			 System.out.print(A.x+" ");
+			 infixe(A.D);
+			 }
+			}
+			
+			
+			
+			//Insertion en version r�cursive
+			public static avl  inserer(int x, avl a) 
+			{
+			  if (a == null)     return new avl(x,null,null);
+			  if (x < a.x)     a.G = inserer(x, a.G);
+			  else if (x > a.x)     a.D = inserer(x, a.D);
+			
+			  return equilibrer(a);
+			}
+
+			
+			//Affichage
+			public static void affichage(avl A){
+			 
+			 System.out.println("\nInfixe :");avl.infixe(A);
+			 System.out.println("\nparcours en largeur  :");avl.ParcoursLargeur(A);
+			}
+			
+			
+
+
+		//Menu
+			static void menu(){
+				
+				System.out.println("\n-------------------------------------------");
+				System.out.println("--------------Arbre �quilibr� ( avl) --------");
+				System.out.println("-------------------------------------------");
+				System.out.println("-1- Ajout.");
+				System.out.println("-2- Suppression un �l�ment.");
+				System.out.println("3- calcul de la hauteur .");
+				System.out.println("-4- equilibrage .");
+				System.out.println("-5- Affichage.");
+				System.out.println("-6- Quitter.");
+				System.out.println("-------------------------------------------\n");
+			
+			}
+			 public static  void ParcoursLargeur(avl ab) {
+			        List  file = new LinkedList();
+				file.add(ab);
+			//	System.out.println(file.size());
+
+				avl a,b;
+				while (!file.isEmpty()) {
+				    a = (avl) file.remove(0);
+				     System.out.println(a.x );
+				  System.out.println(a.x + "-----" + avl.hauteur1(a));
+				   // System.out.println(a.x + "-----" + avl.facteurE(a));
+				    b = a.G;
+				    if (b != null)
+					file.add(b);
+				    b = a.D;
+				    if (b != null)  
+					file.add(b);
+				}
+			    } 
+			 public static avl rotationG(avl a)
+			 {
+				 avl b = a.D;
+				 avl c = 		 new avl( a.x, a.G, b.G);
+			 return 		 new avl(b.x,c, b.D);
+			 }
+			 public static avl rotationD(avl a)
+			 {
+				 avl b = a.G;
+				 avl c = 		 new avl( a.x, b.D, a.D);
+			 return 		 new avl(b.x,b.G, c);
+			 }
+			 
+		
+
+			//Suppression d'un n�ud
+				static avl SuppN(avl A, int x){
+				 avl b=A,p=null;
+				 while(b!=null)
+				 if (b.x==x) break;
+				 else {
+				 p=b;
+				 if (b.x>x)b=b.G;
+				 else b=b.D;
+				 }
+				 if (b!=null)
+				  if (b.G==null && b.D==null)
+				   {
+				   if (p==null) A=null;
+				   else if (p.G==b) p.G=null;
+				   else p.D=null;}
+				   else if (b.G==null || b.D==null){
+				    avl f;
+				    if (b.G == null) f=b.D;
+				    else f=b.G;
+				   if (p==null) A=f;
+				  else if (p.G==b) p.G=f;
+				  else p.D=f;
+				 }else {
+				 avl m=Max(b.G);
+				 b.x=m.x;
+				 SuppN2(b.G,b,m.x);
+				 }
+				
+				return equilibrer(A);
+				}
+				
+				static void SuppN2(avl A,avl per, int x){
+				 avl b=A,p=per;
+				 while(b!=null)
+				  if (b.x==x) break;
+				  else {
+				   p=b;
+				   if (b.x>x)b=b.G;
+				   else b=b.D;
+				  }
+				 if (b!=null)
+				 if (b.G==null && b.D==null)
+				 {
+				  if (p==null) b=null;
+				  else if (p.G==b) p.G=null;
+				  else p.D=null;}
+				  else if (b.G==null || b.D==null){
+				  avl f;
+				  if (b.G == null) f=b.D;
+				  else f=b.G;
+				  if (p==null) b=f;
+				  else if (p.G==b) p.G=f;
+				  else p.D=f;
+				  }
+				 }
+				static avl Max(avl A){
+					 if(A==null) return null;
+					 else if (A.D==null)return A;
+					 else return Max(A.D);
+				}
+
+	public static void main(String[] args) {
+		int ch=0, x;
+		avl A=null;
+		//@SuppressWarnings("resource")
+		Scanner sc = new Scanner(System.in);
+		do{
+			avl.menu();
+			System.out.println("Donner votre choix de 1 � 5 :");
+            ch=sc.nextInt();
+            switch (ch){
+            case 1:
+        		System.out.println("--- Ajout d'un �l�ment.");
+        		System.out.println("Donner un nombre :");
+                x=sc.nextInt();
+                A=avl.inserer(x, A);
+                avl.affichage(A);
+               break;
+            case 2:
+        		System.out.println("--- Suppression d'un �l�ment.");
+        		System.out.println("Donner un nombre.");
+        		x=sc.nextInt();
+                A=avl.SuppN(A,x);
+                avl.affichage(A);
+               
+            	break;
+            
+          
+           case 3:
+            	int ha= avl.H(A);
+        		System.out.println("--- la hauteur de cet arbre est �gale � " + ha);
+        	break;
+            case 4:
+        		System.out.println("--- l'arbre apr�s equlibrage est :");
+        		
+        		avl.affichage(equilibrer(A));
+        		
+        		
+        		
+            case 5:
+        		System.out.println("--- Affichage.");
+        		avl.affichage(A);
+        		
+        		
+        		
+            	break;
+            }
+		}while (ch<8 && ch>0);
+	}}
+	
+
